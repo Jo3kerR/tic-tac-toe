@@ -1,0 +1,277 @@
+@font-face {
+    font-family: 'TicTacToe';
+    src: url('/fonts/TicTacToe.ttf');
+}
+
+:root {
+    --X: url('/imgs/x.svg');
+    --O: url('/imgs/o.svg');
+}
+
+body {
+    text-align: center;
+}
+
+#gameBoard {
+    margin: auto;
+}
+
+#names {
+    margin-top: 120px;
+    text-align: start;
+}
+
+td {
+    height: 90px;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black !important;
+    width: 90px !important;
+}
+
+td:nth-of-type(3) {
+    border-right: none;
+}
+
+tr:nth-of-type(3) td {
+    border-bottom: none !important;
+}
+
+.cell {
+    padding: 0;
+    margin: 0;
+    height: 80px;
+}
+
+#winner {
+    font-family: 'Oxygen', sans-serif;
+    text-align: center;
+    /* border: 2px dashed white; */
+}
+
+#myName {
+    color: cadetblue;
+}
+
+#onlinePlayers {
+    background-color: black;
+    height: 100vh;
+    color: white;
+    text-align: left;
+}
+
+#onlinePlayers>ul {
+    cursor: pointer;
+}
+
+#playersUL {
+    font-family: 'Exo', sans-serif;
+    line-height: 2em;
+    list-style: none;
+    overflow-wrap: break-word;
+}
+#onlinePlayersMSG {
+    margin-left: -20px;
+}
+
+.bullet {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    display: inline-block;
+    width: .6em;
+    margin-left: -1em;
+    font-size: 1.7em;
+}
+
+.active {
+    color: lime;
+}
+
+.inAMatch {
+    color: orange;
+}
+
+.playerLink {
+    display: none;
+}
+
+#chat {
+    border: 2px solid #333;
+    padding: 0;
+}
+
+#formSubmit {
+    background: rgba(0, 0, 0, 0.30);
+    padding: 0.25rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: inherit;
+    display: flex;
+    height: 3rem;
+    box-sizing: border-box;
+}
+
+#input {
+    border: none;
+    padding: 0 1rem;
+    flex-grow: 1;
+    border-radius: 2rem;
+    margin: 0.25rem;
+    width: inherit;
+}
+
+#input:focus {
+    outline: none;
+}
+
+#formSubmit>button {
+    background: #333;
+    border: none;
+    padding: 0 1rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+    outline: none;
+    color: #fff;
+}
+
+#messages {
+    list-style-type: none;
+    padding: 0;
+    font-weight: 400;
+    overflow-wrap: break-word;
+    line-height: 1.2em;
+}
+.chatUser {
+    font-weight: 700;
+}
+
+#messages>li {
+    padding: 0.5rem 1rem;
+    text-align: left;
+}
+
+#messages>li:nth-child(odd) {
+    background: #efefef;
+}
+
+.connection {
+    font-weight: 700;
+}
+
+.joining {
+    color: #63c600;
+}
+
+.leaving {
+    color: crimson;
+}
+
+.timerCSS {
+    background-color: #7fadff;
+    border: solid 2px #477ac4;
+    border-radius: .15rem;
+}
+
+/* body {
+    font-family: sans-serif;
+    display: grid;
+    height: 100vh;
+    place-items: center;
+} */
+
+.base-timer {
+    position: relative;
+    width: 50px;
+    /* height: 1px; */
+}
+
+.base-timer__svg {
+    transform: scaleX(-1);
+}
+
+.base-timer__circle {
+    fill: none;
+    stroke: none;
+}
+
+.base-timer__path-elapsed {
+    stroke-width: 7px;
+    stroke: white;
+}
+
+.base-timer__path-remaining {
+    stroke-width: 7px;
+    stroke-linecap: round;
+    transform: rotate(90deg);
+    transform-origin: center;
+    transition: 1s linear all;
+    fill-rule: nonzero;
+    stroke: currentColor;
+}
+
+.base-timer__path-remaining.green {
+    color: rgb(0, 201, 0);
+}
+
+.base-timer__path-remaining.orange {
+    color: orange;
+}
+
+.base-timer__path-remaining.red {
+    color: red;
+}
+
+.base-timer__label {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+#scores {
+    font-family: 'Noto Serif', serif;
+    font-size: 0.5rem;
+}
+
+#yourTurn {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 2rem;
+}
+
+.blinkText {
+    animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+    0% { color: red;}
+    50% { color: transparent;}
+    100% { color: red;}
+}
+
+#names {
+    font-family: 'Ubuntu', sans-serif;
+    overflow-wrap: break-word;
+    margin-top: 40px;
+}
+
+.blinkingBorder {
+    animation: blinkBorder 0.5s infinite;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    height: 6rem;
+    padding-top: 1.5rem;
+}
+
+@keyframes blinkBorder {
+    0% { border: 2px dashed rgb(17, 70, 121);}
+    50% { border: 2px dashed white; }
+    100% { border: 2px dashed rgb(17, 70, 121);}
+}
+
+.timer {
+    overflow-wrap: break-word;
+}

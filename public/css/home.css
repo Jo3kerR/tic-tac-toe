@@ -1,0 +1,17 @@
+body {
+    background-image: url('/imgs/bg.jpg');
+}
+
+.custFont {
+    margin-top: 15rem;
+    background: white;
+    font-family: 'TicTacToe';
+    font-size: 60px;
+    border: solid 1.5px black;
+}
+
+@media screen and (min-width : 500px) {
+    .container {
+        width: 500px;
+    }
+}
