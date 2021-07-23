@@ -300,6 +300,7 @@ document.querySelector('#acceptChallenge').addEventListener('click', (e) => {
 document.querySelector('#modalBtn').addEventListener('click', (e) => {
     e.preventDefault();
     if (challengeOpen) return;
+    document.querySelector('#cancelBtn').classList.add('disabled') ; 
     challengeTimerStart(0) ; 
     challengeOpen = 1;
     rnds = document.querySelector('#rounds').value;
@@ -317,6 +318,7 @@ document.querySelectorAll('.modalClose')[0].addEventListener('click', (e) => {
     e.preventDefault();
     document.querySelector('#challengePlayer').innerText = '';
     challengeOpen = 0;
+    document.querySelector('#cancelBtn').classList.remove('disabled') ; 
 })
 
 document.querySelectorAll('.modalClose')[1].addEventListener('click', (e) => {
@@ -324,6 +326,11 @@ document.querySelectorAll('.modalClose')[1].addEventListener('click', (e) => {
     document.querySelector('#challengerPlayer').innerText = '';
     document.querySelector('#challengerRounds').innerText = '';
     challengePopUp = 0;
+})
+
+document.querySelector('#cancelBtn').addEventListener('click', (e) => {
+    e.preventDefault() ; 
+    document.querySelectorAll('.modalClose')[0].click();
 })
 
 socket.on('firstPlayer', (playerID, rnds) => {
