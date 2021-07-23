@@ -5,7 +5,7 @@ const path = require('path');
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
-const session = require('express-session');
+const session = require('cookie-session');
 app.use(session({ secret: 'mySecret', resave: false, saveUninitialized: false }));
 
 app.set('view engine', 'ejs');
