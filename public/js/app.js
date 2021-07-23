@@ -398,7 +398,8 @@ socket.on('roomLeft', (st = 0) => {
     document.querySelector('#score').textContent = `\xa0`;
     document.querySelector('#oppScore').textContent = ``;
     document.querySelector('#winner').textContent = `\xa0`;
-    document.querySelector('#winner').classList.remove('blinkingBorder') ; 
+    document.querySelector('#winner').classList.remove('blinkingBorder') ;
+    document.querySelector('#yourTurn').textContent = `\xa0` ; 
     if (pID === 0 || st === 1) socket.emit('roomLeft');
 })
 socket.on('activeStatus', (leftPlayerIDs) => {
@@ -418,19 +419,19 @@ socket.on('activeStatus', (leftPlayerIDs) => {
 // --------------------------------------------------
 
 // ---------------- GAME RESET -------------------------
-
-
 socket.on('reset', (st) => {
     if (st === 1) resetHelper();
     else {
+        document.querySelector('#yourTurn').textContent = `\xa0` ;
         addImage(-1, 1);
         setTimeout(() => {
             resetHelper();
-        }, 1000);
+        }, 2000);
     }
     --roundsLeft;
     if (id >= 0) id ^= 1;
     if (roundsLeft === 0 && Math.max(score[0], score[1]) != Math.ceil(rnds / 2)) {
+        document.querySelector('#yourTurn').classList.remove('blinkText') ; 
         if (score[0] === score[1]) {
             document.querySelector('#winner').innerText = `Game drawn!`;
             document.querySelector('#gameStatus').classList.remove('init');
@@ -449,16 +450,46 @@ socket.on('reset', (st) => {
         return;
     }
     else {
-        startTimer() ; 
+        if(st === 0) setTimeout(() => {
+            startTimer() ; 
+        }, 2000) ;
+        else startTimer() ;  
     }
 })
 
 // ------------------------------------------------------
 
 // -------------------- GAME LOGIC --------------------------------
+const opacityDec = () => {for(const c of cells) c.style.opacity = 0.5;}
+const winnerRow = (x) => {
+    opacityDec() ; 
+    for(let i = 3 * x ; i < 3 * (x+1) ; ++i) cells[i].style.opacity = 1 ; 
+}
+const winnerCol = (x) => {
+    opacityDec() ; 
+    for(let i = x ; i < 9 ; i += 3) cells[i].style.opacity = 1 ; 
+}
+const winnerMainDiag = () => {
+    opacityDec(); 
+    cells[0].style.opacity = 1 ; 
+    cells[4].style.opacity = 1 ; 
+    cells[8].style.opacity = 1 ; 
+}
+const winnerSecDiag = () => {
+    opacityDec() ; 
+    cells[2].style.opacity = 1 ; 
+    cells[4].style.opacity = 1 ; 
+    cells[6].style.opacity = 1 ; 
+}
+
 socket.on('winnerMessage', (cellID) => {
     clearTimerHelper();
+    clicked[Math.floor(cellID/3)][cellID%3] = id ^ 1; 
     addImage(cellID, 1);
+    if(rowCheck(Math.floor(cellID/3))) winnerRow(Math.floor(cellID/3)) ; 
+    else if(colCheck(cellID % 3)) winnerCol(cellID % 3) ;
+    else if(mainDiagCheck()) winnerMainDiag() ; 
+    else if(secDiagCheck()) winnerSecDiag() ; 
     gameOver = true;
     score[1]++;
     document.querySelector('#oppScore').textContent = score[1];
@@ -475,9 +506,11 @@ socket.on('winnerMessage', (cellID) => {
     else {
         setTimeout(() => {
             socket.emit('reset', 1);
-        }, 1000);
+        }, 2000);
     }
 })
+
+// TODO : DECREASE RESET TIME ^
 
 const rowCheck = r => clicked[r][0] != -1 && clicked[r][0] == clicked[r][1] && clicked[r][1] == clicked[r][2];
 const colCheck = c => clicked[0][c] != -1 && clicked[0][c] == clicked[1][c] && clicked[1][c] == clicked[2][c];
@@ -502,28 +535,33 @@ const gameEnd = (cellID, mode) => {
     for (let i = 0; i < 3; ++i) {
         if (rowCheck(i)) {
             gameOver = true;
+            winnerRow(i) ; 
             if (mode === 1) return;
             winnerMessage(i, 0, cellID);
         }
         if (colCheck(i)) {
             gameOver = true;
+            winnerCol(i) ; 
             if (mode === 1) return;
             winnerMessage(0, i, cellID);
         }
     }
     if (mainDiagCheck()) {
         gameOver = true;
+        winnerMainDiag() ; 
         if (mode === 1) return;
         winnerMessage(0, 0, cellID);
     }
     if (secDiagCheck()) {
         gameOver = true;
+        winnerSecDiag() ; 
         if (mode === 1) return;
         winnerMessage(2, 0, cellID);
     }
-    if (rem == 0) {
+    if (rem == 0 && gameOver === false) {
         gameOver = true;
         if (mode === 1) return;
+        document.querySelector('#yourTurn').textContent = `\xa0` ;
         socket.emit('reset', 0);
     }
 }
@@ -552,6 +590,7 @@ let secondsRem, clickTimer;
 const startTimer = () => {
     secondsRem = 10;
     clearInterval(clickTimer);
+    if(rem === 0) return ; 
     clickTimer = setInterval(() => {
         if (secondsRem > 0) countTimer();
     }, 1000);
@@ -604,7 +643,7 @@ for (let i = 0; i < 9; ++i) {
             gameEnd(i, 0);
             clearTimerHelper();
             socket.emit('click', i);
-            if (gameOver === false) startTimer();
+            if (gameOver === false && id != -1) startTimer();
         }
     })
 
@@ -630,7 +669,7 @@ for (let i = 0; i < 9; ++i) {
             player ^= 1;
             gameEnd(i, 1);
             clearTimerHelper();
-            if (gameOver === false) startTimer();
+            if (gameOver === false && id != -1) startTimer();
         }
     })
 }
