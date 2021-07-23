@@ -69,10 +69,10 @@ document.querySelector('#formSubmit').addEventListener('submit', function (e) {
     if (input.value) {
         socket.emit('chat message', playerDetails.username, input.value);
         const item = document.createElement('li');
-        const chatUser = document.createElement('span') ; 
+        const chatUser = document.createElement('span');
         chatUser.textContent = playerDetails.username + ' : ';
-        chatUser.classList.add('chatUser') ; 
-        item.appendChild(chatUser) ;  
+        chatUser.classList.add('chatUser');
+        item.appendChild(chatUser);
         item.appendChild(document.createTextNode(input.value));
         document.querySelector("#messages").appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
@@ -82,11 +82,11 @@ document.querySelector('#formSubmit').addEventListener('submit', function (e) {
 
 socket.on('chat message', function (user, msg) {
     const item = document.createElement('li');
-    const chatUser = document.createElement('span') ; 
+    const chatUser = document.createElement('span');
     if (msg != undefined) {
         chatUser.textContent = playerDetails.username + ' : ';
-        chatUser.classList.add('chatUser') ; 
-        item.appendChild(chatUser) ;  
+        chatUser.classList.add('chatUser');
+        item.appendChild(chatUser);
         item.appendChild(document.createTextNode(msg));
     }
     else {
@@ -105,9 +105,9 @@ let timerInterval = null;
 
 const challengeTimerStart = (x) => {
     clearInterval(timerInterval);
-    timerInterval = null ; 
-    for(let i = 0 ; i < 2 ; ++i) {
-        document.querySelectorAll('.challengeTimer')[i].innerHTML = `` ; 
+    timerInterval = null;
+    for (let i = 0; i < 2; ++i) {
+        document.querySelectorAll('.challengeTimer')[i].innerHTML = ``;
     }
 
     const FULL_DASH_ARRAY = 283;
@@ -163,7 +163,7 @@ const challengeTimerStart = (x) => {
 
     function startTimer2() {
         timerInterval = setInterval(() => {
-            timePassed ++ ; 
+            timePassed++;
             timeLeft = TIME_LIMIT - timePassed;
             document.getElementById("base-timer-label").innerHTML = formatTime(
                 timeLeft
@@ -236,7 +236,7 @@ document.querySelector('#playersUL').addEventListener('click', (e) => {
         username = e.target.innerText.substring(1);
         const challenge = `vs ${username}`;
         if (playerID != playerDetails.playerID) {
-            challengeTimerStart(0) ; 
+            challengeTimerStart(0);
             document.querySelector('#challengePlayer').appendChild(document.createTextNode(challenge));
             document.querySelector('#challengeModal').click();
             clearTimeout(challengeTimer);
@@ -267,7 +267,7 @@ socket.on('challenge', (challengerID, challengerUsername, Rnds) => {
         socket.emit('pending', challengerID);
         return;
     }
-    challengeTimerStart(1) ; 
+    challengeTimerStart(1);
     challengePopUp = 1;
     const challengerPlayer = document.querySelector('#challengerPlayer');
     const challengerRounds = document.querySelector('#challengerRounds');
@@ -300,8 +300,8 @@ document.querySelector('#acceptChallenge').addEventListener('click', (e) => {
 document.querySelector('#modalBtn').addEventListener('click', (e) => {
     e.preventDefault();
     if (challengeOpen) return;
-    document.querySelector('#cancelBtn').classList.add('disabled') ; 
-    challengeTimerStart(0) ; 
+    document.querySelector('#cancelBtn').classList.add('disabled');
+    challengeTimerStart(0);
     challengeOpen = 1;
     rnds = document.querySelector('#rounds').value;
     roundsLeft = rnds;
@@ -318,7 +318,7 @@ document.querySelectorAll('.modalClose')[0].addEventListener('click', (e) => {
     e.preventDefault();
     document.querySelector('#challengePlayer').innerText = '';
     challengeOpen = 0;
-    document.querySelector('#cancelBtn').classList.remove('disabled') ; 
+    document.querySelector('#cancelBtn').classList.remove('disabled');
 })
 
 document.querySelectorAll('.modalClose')[1].addEventListener('click', (e) => {
@@ -329,7 +329,7 @@ document.querySelectorAll('.modalClose')[1].addEventListener('click', (e) => {
 })
 
 document.querySelector('#cancelBtn').addEventListener('click', (e) => {
-    e.preventDefault() ; 
+    e.preventDefault();
     document.querySelectorAll('.modalClose')[0].click();
 })
 
@@ -339,9 +339,9 @@ socket.on('firstPlayer', (playerID, rnds) => {
     document.querySelector('#opponent').textContent = username;
     document.querySelector('#myUsername').textContent = `${playerDetails.username} (You)`;
     document.querySelector('#vs').textContent = `vs`;
-    document.querySelector('#score').textContent = `0`;
-    document.querySelector('#oppScore').textContent = `0`;
-    document.querySelector('#yourTurn').classList.add('blinkText') ; 
+    document.querySelectorAll('.score')[0].textContent = `0`;
+    document.querySelectorAll('.score')[1].textContent = `0`;
+    document.querySelector('#yourTurn').classList.add('blinkText');
     startTimer();
     if (id === 1) {
         const res = document.querySelector('.badge');
@@ -377,6 +377,20 @@ window.onbeforeunload = function () {
 // ----------------------------------------------------------
 
 // ----------------- ROOM LEFT -----------------------
+const gameOverHelper = (st = 0) => {
+    const pID = id;
+    id = -1;
+    resetHelper();
+    score = [0, 0];
+    document.querySelector('#opponent').textContent = '';
+    document.querySelector('#myUsername').textContent = `\xa0`;
+    document.querySelector('#vs').textContent = ``;
+    document.querySelectorAll('.score')[0].textContent = `\xa0`;
+    document.querySelectorAll('.score')[1].textContent = ``;
+    document.querySelector('#winner').textContent = `\xa0`;
+    document.querySelector('#winner').classList.remove('blinkingBorder');
+    if (pID === 0 || st === 1) socket.emit('roomLeft');
+}
 const clearTimerHelper = () => {
     clearInterval(clickTimer);
     for (let j = 0; j < 2; ++j) {
@@ -384,7 +398,13 @@ const clearTimerHelper = () => {
             document.querySelectorAll('.timer')[j].lastChild.remove();
     }
 }
+const msgHelper = () => {
+    document.querySelector('#winner').classList.add('blinkingBorder');
+    document.querySelector('#yourTurn').classList.remove('blinkText');
+    document.querySelector('#yourTurn').textContent = '\xa0';
+}
 const resetHelper = () => {
+    --roundsLeft;
     clicked = [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]];
     player = 0;
     rem = 9;
@@ -393,22 +413,17 @@ const resetHelper = () => {
     }
     gameOver = false;
     clearTimerHelper();
+    if (roundsLeft === 0 && id != -1) {
+        msgHelper() ; 
+        if (score[0] === score[1]) document.querySelector('#winner').innerText = `Game Drawn!`;
+        else if(score[0] < score[1]) document.querySelector('#winner').innerText = `${username} is the winner!`;
+        else document.querySelector('#winner').innerText = `${playerDetails.username} is the winner!`;
+        setTimeout(() => {
+            gameOverHelper();
+        }, 2000);
+    }
+    if (roundsLeft > 0 && id != -1) startTimer();
 }
-socket.on('roomLeft', (st = 0) => {
-    resetHelper();
-    const pID = id;
-    id = -1;
-    score = [0, 0];
-    document.querySelector('#opponent').textContent = '';
-    document.querySelector('#myUsername').textContent = `\xa0`;
-    document.querySelector('#vs').textContent = ``;
-    document.querySelector('#score').textContent = `\xa0`;
-    document.querySelector('#oppScore').textContent = ``;
-    document.querySelector('#winner').textContent = `\xa0`;
-    document.querySelector('#winner').classList.remove('blinkingBorder') ;
-    document.querySelector('#yourTurn').textContent = `\xa0` ; 
-    if (pID === 0 || st === 1) socket.emit('roomLeft');
-})
 socket.on('activeStatus', (leftPlayerIDs) => {
     const playerLink = document.querySelectorAll('.playerLink');
     const bullet = document.querySelectorAll('.bullet');
@@ -425,165 +440,92 @@ socket.on('activeStatus', (leftPlayerIDs) => {
 })
 // --------------------------------------------------
 
-// ---------------- GAME RESET -------------------------
-socket.on('reset', (st) => {
-    if (st === 1) resetHelper();
-    else {
-        document.querySelector('#yourTurn').textContent = `\xa0` ;
-        addImage(-1, 1);
-        setTimeout(() => {
-            resetHelper();
-        }, 2000);
-    }
-    --roundsLeft;
-    if (id >= 0) id ^= 1;
-    if (roundsLeft === 0 && Math.max(score[0], score[1]) != Math.ceil(rnds / 2)) {
-        document.querySelector('#yourTurn').classList.remove('blinkText') ; 
-        if (score[0] === score[1]) {
-            document.querySelector('#winner').innerText = `Game drawn!`;
-            document.querySelector('#gameStatus').classList.remove('init');
-        }
-        else if (score[0] > score[1]) {
-            document.querySelector('#winner').innerText = `${playerDetails.username} is the winner!`;
-            document.querySelector('#gameStatus').classList.remove('init');
-        }
-        else {
-            document.querySelector('#winner').innerText = `${username} is the winner!`;
-            document.querySelector('#gameStatus').classList.remove('init');
-        }
-        setTimeout(() => {
-            socket.emit('gameOver');
-        }, 2000);
-        return;
-    }
-    else {
-        if(st === 0) setTimeout(() => {
-            startTimer() ; 
-        }, 2000) ;
-        else startTimer() ;  
-    }
-})
-
-// ------------------------------------------------------
-
 // -------------------- GAME LOGIC --------------------------------
-const opacityDec = () => {for(const c of cells) c.style.opacity = 0.5;}
+const opacityDec = () => { for (const c of cells) c.style.opacity = 0.5; }
 const winnerRow = (x) => {
-    opacityDec() ; 
-    for(let i = 3 * x ; i < 3 * (x+1) ; ++i) cells[i].style.opacity = 1 ; 
+    opacityDec();
+    for (let i = 3 * x; i < 3 * (x + 1); ++i) cells[i].style.opacity = 1;
 }
 const winnerCol = (x) => {
-    opacityDec() ; 
-    for(let i = x ; i < 9 ; i += 3) cells[i].style.opacity = 1 ; 
+    opacityDec();
+    for (let i = x; i < 9; i += 3) cells[i].style.opacity = 1;
 }
 const winnerMainDiag = () => {
-    opacityDec(); 
-    cells[0].style.opacity = 1 ; 
-    cells[4].style.opacity = 1 ; 
-    cells[8].style.opacity = 1 ; 
+    opacityDec();
+    cells[0].style.opacity = cells[4].style.opacity = cells[8].style.opacity = 1;
 }
 const winnerSecDiag = () => {
-    opacityDec() ; 
-    cells[2].style.opacity = 1 ; 
-    cells[4].style.opacity = 1 ; 
-    cells[6].style.opacity = 1 ; 
+    opacityDec();
+    cells[2].style.opacity = cells[4].style.opacity = cells[6].style.opacity = 1;
 }
-
-socket.on('winnerMessage', (cellID) => {
-    clearTimerHelper();
-    clicked[Math.floor(cellID/3)][cellID%3] = id ^ 1; 
-    addImage(cellID, 1);
-    if(rowCheck(Math.floor(cellID/3))) winnerRow(Math.floor(cellID/3)) ; 
-    else if(colCheck(cellID % 3)) winnerCol(cellID % 3) ;
-    else if(mainDiagCheck()) winnerMainDiag() ; 
-    else if(secDiagCheck()) winnerSecDiag() ; 
-    gameOver = true;
-    score[1]++;
-    document.querySelector('#oppScore').textContent = score[1];
-    document.querySelector('#yourTurn').textContent = `\xa0`;
-    if (score[1] === Math.ceil(rnds / 2)) {
-        document.querySelector('#winner').classList.add('blinkingBorder') ; 
-        document.querySelector('#winner').innerText = `${username} is the winner!`;
-        document.querySelector('#gameStatus').classList.remove('init');
-        document.querySelector('#yourTurn').classList.remove('blinkText') ; 
-        setTimeout(() => {
-            socket.emit('gameOver');
-        }, 2000);
-    }
-    else {
-        setTimeout(() => {
-            socket.emit('reset', 1);
-        }, 2000);
-    }
-})
-
-// TODO : DECREASE RESET TIME ^
 
 const rowCheck = r => clicked[r][0] != -1 && clicked[r][0] == clicked[r][1] && clicked[r][1] == clicked[r][2];
 const colCheck = c => clicked[0][c] != -1 && clicked[0][c] == clicked[1][c] && clicked[1][c] == clicked[2][c];
 const mainDiagCheck = () => clicked[0][0] != -1 && clicked[0][0] == clicked[1][1] && clicked[1][1] == clicked[2][2];
 const secDiagCheck = () => clicked[0][2] != -1 && clicked[0][2] == clicked[1][1] && clicked[1][1] == clicked[2][0];
-const winnerMessage = (i, j, cellID) => {
+const winnerMessage = (i, j) => {
     clearTimerHelper();
-    score[0]++;
-    document.querySelector('#score').textContent = score[0];
-    if (score[0] === Math.ceil(rnds / 2)) {
-        document.querySelector('#winner').classList.add('blinkingBorder') ;
-        document.querySelector('#winner').innerText = `${playerDetails.username} is the winner!`;
-        document.querySelector('#gameStatus').classList.remove('init');
-        document.querySelector('#yourTurn').classList.remove('blinkText') ;
+    let x;
+    console.log(clicked, i, j, id)
+    if (clicked[i][j] === id) x = 0;
+    else x = 1;
+    score[x]++;
+    document.querySelectorAll('.score')[x].textContent = score[x];
+    id ^= 1;
+    if (score[x] === Math.ceil(rnds / 2)) {
+        id = -1;
+        let winnerUsername;
+        if (x === 0) winnerUsername = playerDetails.username;
+        else winnerUsername = username;
+        msgHelper() ; 
+        document.querySelector('#winner').innerText = `${winnerUsername} is the winner!`;
+        setTimeout(() => {
+            gameOverHelper(1);
+        }, 2000);
     }
-    document.querySelector('#yourTurn').textContent = `\xa0`; 
-    socket.emit('winnerMessage', cellID);
+    else {
+        document.querySelector('#yourTurn').textContent = '\xa0';
+        setTimeout(() => resetHelper(), 2000);
+    }
 }
 
-const gameEnd = (cellID, mode) => {
+const gameEnd = (cellID) => {
     if (gameOver) return;
     for (let i = 0; i < 3; ++i) {
         if (rowCheck(i)) {
             gameOver = true;
-            winnerRow(i) ; 
-            if (mode === 1) return;
-            winnerMessage(i, 0, cellID);
+            winnerRow(i);
+            winnerMessage(i, 0);
+            return;
         }
         if (colCheck(i)) {
             gameOver = true;
-            winnerCol(i) ; 
-            if (mode === 1) return;
-            winnerMessage(0, i, cellID);
+            winnerCol(i);
+            winnerMessage(0, i);
+            return;
         }
     }
     if (mainDiagCheck()) {
         gameOver = true;
-        winnerMainDiag() ; 
-        if (mode === 1) return;
-        winnerMessage(0, 0, cellID);
+        winnerMainDiag();
+        winnerMessage(0, 0);
+        return;
     }
     if (secDiagCheck()) {
         gameOver = true;
-        winnerSecDiag() ; 
-        if (mode === 1) return;
-        winnerMessage(2, 0, cellID);
+        winnerSecDiag();
+        winnerMessage(2, 0);
+        return;
     }
     if (rem == 0 && gameOver === false) {
         gameOver = true;
-        if (mode === 1) return;
-        document.querySelector('#yourTurn').textContent = `\xa0` ;
-        socket.emit('reset', 0);
+        id ^= 1;
+        document.querySelector('#yourTurn').textContent = `\xa0`;
+        setTimeout(() => resetHelper(), 2000);
     }
 }
 
 const addImage = (cellID, imgOpacity) => {
-    if (cellID === -1) {
-        for (let i = 0; i < 3; ++i) {
-            for (let j = 0; j < 3; ++j) {
-                if (clicked[i][j] === -1) {
-                    cellID = 3 * i + j;
-                }
-            }
-        }
-    }
-    if (cellID === -1) return;
     if (player & 1) setImage = 'var(--X)';
     else setImage = 'var(--O)';
     cells[cellID].style.opacity = imgOpacity;
@@ -597,18 +539,18 @@ let secondsRem, clickTimer;
 const startTimer = () => {
     secondsRem = 10;
     clearInterval(clickTimer);
-    if(rem === 0) return ; 
+    if (rem === 0) return;
     clickTimer = setInterval(() => {
         if (secondsRem > 0) countTimer();
     }, 1000);
-    let whoseTurn ; 
-    if(id === player) {
-        whoseTurn = 'YOUR TURN!' ; 
+    let whoseTurn;
+    if (id === player) {
+        whoseTurn = 'YOUR TURN!';
     }
     else {
-        whoseTurn = `\xa0` ; 
+        whoseTurn = `\xa0`;
     }
-    document.querySelector('#yourTurn').textContent = whoseTurn; 
+    document.querySelector('#yourTurn').textContent = whoseTurn;
     for (let i = 0; i < 10; ++i) {
         const timerBg = document.createElement('span');
         timerBg.appendChild(document.createTextNode(`\xa0\xa0`));
@@ -638,19 +580,23 @@ const countTimer = () => {
     }
 }
 
+const clickHelper = (i) => {
+    clicked[Math.floor(i / 3)][i % 3] = player;
+    addImage(i, 1);
+    player ^= 1;
+    --rem;
+    gameEnd(i);
+    clearTimerHelper();
+    if (gameOver === false && id != -1) startTimer();
+}
+
 for (let i = 0; i < 9; ++i) {
 
     cells[i].addEventListener('click', () => {
         if (gameOver) return;
         if (clicked[Math.floor(i / 3)][i % 3] === -1 && player == id) {
-            clicked[Math.floor(i / 3)][i % 3] = player;
-            addImage(i, 1);
-            player ^= 1;
-            --rem;
-            gameEnd(i, 0);
-            clearTimerHelper();
             socket.emit('click', i);
-            if (gameOver === false && id != -1) startTimer();
+            clickHelper(i);
         }
     })
 
@@ -670,13 +616,7 @@ for (let i = 0; i < 9; ++i) {
     socket.on('click', (cellID) => {
         if (gameOver) return;
         if (i == cellID) {
-            clicked[Math.floor(i / 3)][i % 3] = player;
-            addImage(i, 1);
-            --rem;
-            player ^= 1;
-            gameEnd(i, 1);
-            clearTimerHelper();
-            if (gameOver === false && id != -1) startTimer();
+            clickHelper(i);
         }
     })
 }

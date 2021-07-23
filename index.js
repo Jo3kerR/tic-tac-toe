@@ -119,20 +119,7 @@ io.on('connection', (socket) => {
         io.emit('inAMatch', playerID1, playerID2);
     })
 
-    // ------------- WINNER MESSAGE --------------
-    socket.on('winnerMessage', (cellID) => {
-        socket.broadcast.to(socket.roomID).emit('winnerMessage', cellID);
-    })
-
-    // ------------- GAME RESET -------------------
-    socket.on('reset', (st) => {
-        io.to(socket.roomID).emit('reset', st);
-    })
-
     // -------------- GAME OVER -------------------
-    socket.on('gameOver', () => { 
-        io.to(socket.roomID).emit('roomLeft', 1);
-    })
     socket.on('roomLeft', () => {
         const roomID = socket.roomID;
         const leftPlayerIDs = [] ; 
