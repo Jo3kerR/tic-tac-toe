@@ -463,11 +463,11 @@ socket.on('winnerMessage', (cellID) => {
     score[1]++;
     document.querySelector('#oppScore').textContent = score[1];
     document.querySelector('#yourTurn').textContent = `\xa0`;
-    document.querySelector('#yourTurn').classList.remove('blinkText') ; 
     if (score[1] === Math.ceil(rnds / 2)) {
         document.querySelector('#winner').classList.add('blinkingBorder') ; 
         document.querySelector('#winner').innerText = `${username} is the winner!`;
         document.querySelector('#gameStatus').classList.remove('init');
+        document.querySelector('#yourTurn').classList.remove('blinkText') ; 
         setTimeout(() => {
             socket.emit('gameOver');
         }, 2000);
@@ -491,8 +491,8 @@ const winnerMessage = (i, j, cellID) => {
         document.querySelector('#winner').classList.add('blinkingBorder') ;
         document.querySelector('#winner').innerText = `${playerDetails.username} is the winner!`;
         document.querySelector('#gameStatus').classList.remove('init');
+        document.querySelector('#yourTurn').classList.remove('blinkText') ;
     }
-    document.querySelector('#yourTurn').classList.remove('blinkText') ;
     document.querySelector('#yourTurn').textContent = `\xa0`; 
     socket.emit('winnerMessage', cellID);
 }
