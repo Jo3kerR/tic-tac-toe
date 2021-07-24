@@ -84,7 +84,7 @@ socket.on('chat message', function (user, msg) {
     const item = document.createElement('li');
     const chatUser = document.createElement('span');
     if (msg != undefined) {
-        chatUser.textContent = playerDetails.username + ' : ';
+        chatUser.textContent = user + ' : ';
         chatUser.classList.add('chatUser');
         item.appendChild(chatUser);
         item.appendChild(document.createTextNode(msg));
@@ -128,7 +128,7 @@ const challengeTimerStart = (x) => {
         }
     };
 
-    const TIME_LIMIT = 9;
+    const TIME_LIMIT = 10;
     let timePassed = 0;
     let timeLeft = TIME_LIMIT;
     let remainingPathColor = COLOR_CODES.info.color;
