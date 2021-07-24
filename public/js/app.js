@@ -75,7 +75,8 @@ document.querySelector('#formSubmit').addEventListener('submit', function (e) {
         item.appendChild(chatUser);
         item.appendChild(document.createTextNode(input.value));
         document.querySelector("#messages").appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        // window.scrollTo(0, document.body.scrollHeight);
+        document.querySelector('#chat').scrollTop = document.querySelector('#chat').scrollHeight ; 
         input.value = '';
     }
 });

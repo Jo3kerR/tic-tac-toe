@@ -57,6 +57,7 @@ tr:nth-of-type(3) td {
     height: 100vh;
     color: white;
     text-align: left;
+    overflow-y: auto;
 }
 
 #onlinePlayers>ul {
@@ -96,7 +97,10 @@ tr:nth-of-type(3) td {
 
 #chat {
     border: 2px solid #333;
+    border-bottom: none;
     padding: 0;
+    overflow-y: auto;
+    height: 100vh;
 }
 
 #formSubmit {
