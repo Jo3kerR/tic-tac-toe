@@ -42,7 +42,7 @@ socket.on('newPlayer', (playerDetails) => {
     const newPlayerLink = document.createElement('span');
     const newBullet = document.createElement('span');
 
-    newBullet.classList.add('bullet', playerDetails.status);
+    newBullet.classList.add('bullet', 'active');
     newPlayer.classList.add('playerList');
     newPlayerLink.classList.add('playerLink');
 

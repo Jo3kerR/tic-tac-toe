@@ -35,7 +35,7 @@ app.get('/game', (req, res) => {
     const playerDetails = {
         username: req.session.username,
         playerID: uuidv4(),
-        status: 'active'
+        isActive: true
     };
     players.push(playerDetails);
     res.render('game', { players });
@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
     socket.on('newPlayer', (playerDetails) => {
         socket.username = playerDetails.username;
         socket.playerID = playerDetails.playerID;
-        socket.status = 'active';
+        socket.isActive = true;
         playerSockets.push(socket);
         socket.broadcast.emit('newPlayer', playerDetails);
     })
@@ -81,34 +81,35 @@ io.on('connection', (socket) => {
         }
     })
     socket.on('pending', (playerID) => {
-        for(const curSocket of playerSockets) {
-            if(curSocket.playerID === playerID) {
-                curSocket.emit('pending') ; 
+        for (const curSocket of playerSockets) {
+            if (curSocket.playerID === playerID) {
+                curSocket.emit('pending');
             }
         }
     })
 
     // ----------- PLAYER JOINS ROOM -------------------
     socket.on('newRoom', (playerID1, playerID2, rounds) => {
+        const roomJoin = (curSocket) => {
+            curSocket.roomID = roomID;
+            curSocket.join(roomID);
+            curSocket.isActive = false;
+        }
         const roomID = uuidv4();
         for (const curSocket of playerSockets) {
             if (curSocket.playerID === playerID1) {
-                curSocket.roomID = roomID;
-                curSocket.join(roomID);
-                curSocket.status = 'inAMatch';
+                roomJoin(curSocket) ; 
             }
             if (curSocket.playerID === playerID2) {
-                curSocket.roomID = roomID;
-                curSocket.join(roomID);
-                curSocket.status = 'inAMatch';
+                roomJoin(curSocket) ; 
             }
         }
         for (const player of players) {
             if (player.playerID === playerID1) {
-                player.status = 'inAMatch';
+                player.isActive = false ; 
             }
             if (player.playerID === playerID2) {
-                player.status = 'inAMatch';
+                player.isActive = false ; 
             }
         }
         io.to(roomID).emit('firstPlayer', playerID1, rounds);
@@ -122,17 +123,17 @@ io.on('connection', (socket) => {
     // -------------- GAME OVER -------------------
     socket.on('roomLeft', () => {
         const roomID = socket.roomID;
-        const leftPlayerIDs = [] ; 
+        const leftPlayerIDs = [];
         for (let i = 0; i < players.length; ++i) {
             if (playerSockets[i].roomID === roomID) {
-                playerSockets[i].status = 'active';
-                players[i].status = 'active';
+                playerSockets[i].isActive = true ; 
+                players[i].isActive = true ; 
                 playerSockets[i].roomID = '';
-                leftPlayerIDs.push(players[i].playerID) ; 
+                leftPlayerIDs.push(players[i].playerID);
             }
         }
         io.socketsLeave(socket.roomID);
-        io.emit('activeStatus', leftPlayerIDs) ;
+        io.emit('activeStatus', leftPlayerIDs);
     })
 
     // ------------ GAME DATA TRANSMIT ------------
