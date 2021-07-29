@@ -130,13 +130,8 @@
                     <div id="onlinePlayersMSG">Online Players (Click to challenge) :</div>
                     <li id="myName" class="playerList"><span class="bullet active">&bull;</span><%= `${players[players.length-1].username} (You)`%><span class="playerLink"><%= players[players.length-1].playerID %></span></li>
                     <% for(let i = 0 ; i < players.length-1 ; ++i) { %>
-                        <li class="playerList"><span class="bullet 
-                            <% if(players[i].isActive === true) { %> 
-                                <%= 'active' %>
-                            <% } else { %> 
-                                <%= 'inAMatch' %> 
-                            <% } %>   
-                            ">&bull;</span><%= players[i].username %><span class="playerLink"><%= players[i].playerID %></span></li>
+                        <li class="playerList"><span class="bullet <% if(players[i].isActive === true) { %><%= 'active' %><% } else { %><%= 'inAMatch' %>
+                            <% } %>">&bull;</span><%= players[i].username %><span class="playerLink"><%= players[i].playerID %></span></li>
                     <% } %> 
                 </ul>
             </div>

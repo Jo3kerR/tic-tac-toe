@@ -235,6 +235,9 @@ document.querySelector('#playersUL').addEventListener('click', (e) => {
         const len = `${e.target.innerHTML}`.length;
         playerID = `${e.target.innerHTML}`.slice(len - 43, len - 7);
         username = e.target.innerText.substring(1);
+        const status = `${e.target.innerHTML}`.slice(20, 26) ; 
+        console.log(status)
+        if(status != 'active') return ; 
         const challenge = `vs ${username}`;
         if (playerID != playerDetails.playerID) {
             challengeTimerStart(0);
@@ -362,6 +365,7 @@ socket.on('inAMatch', (playerID1, playerID2) => {
     for (let i = 0; i < playerLink.length; ++i) {
         const playerID = playerLink[i].textContent;
         if (playerID === playerID1 || playerID === playerID2) {
+            bullet[i].classList.remove('active') ; 
             bullet[i].classList.add('inAMatch');
         }
     }
